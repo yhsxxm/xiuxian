@@ -578,46 +578,31 @@ body{
 /* ========== FORCE LANDSCAPE OVERRIDE ========== */
 .game-container.force-landscape{border-radius:0!important;box-shadow:none!important}
 
-/* ========== PORTRAIT → LANDSCAPE ROTATION ========== */
-@media(orientation:portrait){
-  body{
-    width:100vh!important;height:100vw!important;
-    transform:rotate(-90deg) translateX(-100%)!important;
-    transform-origin:left top!important;
-    background:#000!important;
-    justify-content:center!important;align-items:center!important;
-    min-height:auto!important;overflow:hidden!important;
-  }
-  .game-container{
-    transform:scale(min(0.406,min(100vh/2000,100vw/900)))!important;
-    transform-origin:center center!important;
-    border-radius:0!important;box-shadow:none!important;
-  }
-}
+/* ========== PORTRAIT → LANDSCAPE (JS-driven, see script) ========== */
 
 /* ========== MOBILE SCALE ADAPTATION ========== */
 /* Automatically scale to fit any screen size */
-@media(orientation:landscape) and (max-height:600px){
+@media(max-height:600px){
   .game-container{transform:scale(0.40);transform-origin:top left}
   body{align-items:flex-start;justify-content:flex-start}
 }
-@media(orientation:landscape) and (min-height:601px) and (max-height:720px){
+@media(min-height:601px) and (max-height:720px){
   .game-container{transform:scale(0.48);transform-origin:top left}
   body{align-items:flex-start;justify-content:flex-start}
 }
-@media(orientation:landscape) and (min-height:721px) and (max-height:860px){
+@media(min-height:721px) and (max-height:860px){
   .game-container{transform:scale(0.55);transform-origin:top left}
   body{align-items:flex-start;justify-content:flex-start}
 }
-@media(orientation:landscape) and (min-height:861px) and (max-height:1050px){
+@media(min-height:861px) and (max-height:1050px){
   .game-container{transform:scale(0.65);transform-origin:top left}
   body{align-items:flex-start;justify-content:flex-start}
 }
-@media(orientation:landscape) and (min-height:1051px) and (max-height:1300px){
+@media(min-height:1051px) and (max-height:1300px){
   .game-container{transform:scale(0.78);transform-origin:top left}
   body{align-items:flex-start;justify-content:flex-start}
 }
-@media(orientation:landscape) and (min-height:1301px) and (max-height:1600px){
+@media(min-height:1301px) and (max-height:1600px){
   .game-container{transform:scale(0.88);transform-origin:top left}
   body{align-items:flex-start;justify-content:flex-start}
 }
@@ -895,6 +880,19 @@ document.addEventListener('webkitfullscreenchange',()=>{
   const icon=document.getElementById('fsIcon');
   if(icon)icon.textContent=document.webkitFullscreenElement?'⛷':'⛶';
 });
+
+// ==================== SCALE TO FIT ====================
+(function(){
+  var s=document.createElement('style'); s.id='fit-style'; document.head.appendChild(s);
+  function apply(){
+    var w=window.innerWidth, h=window.innerHeight;
+    var scale=Math.min(w/2000, h/900);
+    s.textContent='body{display:flex!important;justify-content:center!important;align-items:center!important;min-height:100vh!important;background:#000!important;overflow:hidden!important}.game-container{transform:scale('+scale+')!important;transform-origin:center center!important}';
+  }
+  apply();
+  window.addEventListener('resize',apply);
+  window.addEventListener('orientationchange',function(){setTimeout(apply,100)});
+})();
 
 // ==================== STATIC UI INITIALIZATION ====================
   document.getElementById('topLingshi').textContent='1000';
