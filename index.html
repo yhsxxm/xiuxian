@@ -574,27 +574,12 @@ body{
 /* Boss Rush Overlay */
 #bossRushOverlay>div>div>div:hover{background:#FFF8E1;border-color:#FF9800;transform:scale(1.05);transition:all 0.15s}
 
-/* ========== MOBILE LANDSCAPE SUPPORT ========== */
-.rotate-hint{
-  display:none;
-  position:fixed;top:0;left:0;width:100vw;height:100vh;
-  background:rgba(0,0,0,0.9);z-index:99999;
-  justify-content:center;align-items:center;flex-direction:column;
-  color:#FFF;font-family:system-ui,sans-serif;
-}
-.rotate-hint.show{display:flex}
-.rotate-hint .phone-icon{
-  width:80px;height:120px;border:4px solid #FFF;border-radius:12px;
-  margin-bottom:24px;animation:rotatePhone 1.5s ease-in-out infinite;
-}
-@keyframes rotatePhone{
-  0%,100%{transform:rotate(0deg)}
-  50%{transform:rotate(90deg)}
-}
-.rotate-hint .rotate-text{font-size:20px;font-weight:600;margin-bottom:8px}
-.rotate-hint .rotate-sub{font-size:14px;color:#AAA}
 
-/* Mobile landscape: scale down to fit */
+/* ========== FORCE LANDSCAPE OVERRIDE ========== */
+.game-container.force-landscape{transform:none!important;border-radius:0!important;box-shadow:none!important}
+
+/* ========== MOBILE SCALE ADAPTATION ========== */
+/* Automatically scale to fit any screen size */
 @media(max-height:600px){
   .game-container{transform:scale(0.40);transform-origin:top left}
   body{align-items:flex-start;justify-content:flex-start}
@@ -894,59 +879,59 @@ document.addEventListener('webkitfullscreenchange',()=>{
   if(icon)icon.textContent=document.webkitFullscreenElement?'⛷':'⛶';
 });
 
-// ==================== MOBILE LANDSCAPE DETECTION ====================
+// ==================== FORCE LANDSCAPE ====================
 (function(){
-  const hint=document.createElement('div');
-  hint.className='rotate-hint';
-  hint.innerHTML='<div class="phone-icon"></div><div class="rotate-text">请旋转设备</div><div class="rotate-sub">横屏模式体验更佳</div>';
-  document.body.appendChild(hint);
+  const container=document.getElementById('gameContainer');
 
-  function checkOrientation(){
-    const isLandscape=window.innerWidth > window.innerHeight;
-    if(isLandscape){
-      hint.classList.remove('show');
-      document.body.style.overflow='';
+  function apply(){
+    const w=window.innerWidth, h=window.innerHeight;
+    const portrait=h>w;
+
+    if(portrait){
+      // Lock orientation
+      if(screen.orientation&&screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{});
+      // Rotate 90° + scale to fill screen
+      const scale=Math.min(w/900, h/2000);
+      container.classList.add('force-landscape');
+      container.style.position='fixed';
+      container.style.top='0';container.style.left='0';
+      container.style.width='900px';container.style.height='2000px';
+      container.style.transform='rotate(90deg) scale('+scale+')';
+      container.style.transformOrigin='top left';
+      document.body.style.background='#000';
+      document.body.style.justifyContent='flex-start';
+      document.body.style.alignItems='flex-start';
     }else{
-      hint.classList.add('show');
-      document.body.style.overflow='hidden';
+      container.classList.remove('force-landscape');
+      container.style.position='';
+      container.style.top='';container.style.left='';
+      container.style.width='';container.style.height='';
+      container.style.transform='';
+      container.style.transformOrigin='';
+      document.body.style.background='';
+      document.body.style.justifyContent='';
+      document.body.style.alignItems='';
     }
   }
 
-  checkOrientation();
-  window.addEventListener('resize',checkOrientation);
-  window.addEventListener('orientationchange',()=>setTimeout(checkOrientation,100));
-
-  // Try to lock landscape on supported devices
-  if(screen.orientation && screen.orientation.lock){
-    screen.orientation.lock('landscape').catch(()=>{});
-  }
+  apply();
+  window.addEventListener('resize',apply);
+  window.addEventListener('orientationchange',()=>setTimeout(apply,100));
 
   // ==================== STATIC UI INITIALIZATION ====================
-  // Fill UI with placeholder values to show the design
-  document.getElementById('topLingshi').textContent = '1000';
-  document.getElementById('topQiVal').textContent = '500';
-  document.getElementById('topQiBar').style.width = '100%';
-  document.getElementById('topQiLabel').textContent = '500/500';
-  document.getElementById('topExpVal').textContent = '0';
-  document.getElementById('topRate').textContent = '灵力+1.0/s 经验+0.5/s';
-  document.getElementById('topRealm').textContent = '筑基 · 三层';
+  document.getElementById('topLingshi').textContent='1000';
+  document.getElementById('topQiVal').textContent='500';
+  document.getElementById('topQiBar').style.width='100%';
+  document.getElementById('topQiLabel').textContent='500/500';
+  document.getElementById('topExpVal').textContent='0';
+  document.getElementById('topRate').textContent='灵力+1.0/s 经验+0.5/s';
+  document.getElementById('topRealm').textContent='筑基 · 三层';
 
-  // Fill combat log with static welcome
-  const log = document.getElementById('combatLog');
-  if(log){
-    log.innerHTML = '<div class="log-entry log-info">✦ 修仙大世界 · UI 骨架预览 ✦</div>'+
-      '<div class="log-entry">左侧：队伍面板 | 中央：战斗区域 | 右侧：功能菜单</div>'+
-      '<div class="log-entry">已适配 20:9 超宽屏 & 移动端横屏</div>';
-  }
+  const log=document.getElementById('combatLog');
+  if(log)log.innerHTML='<div class="log-entry log-info">✦ 修仙大世界 · UI 骨架预览 ✦</div><div class="log-entry">左侧：队伍面板 | 中央：战斗区域 | 右侧：功能菜单</div><div class="log-entry">已适配 20:9 超宽屏 & 移动端横屏</div>';
 
-  // Panel switch (non-functional, just UI view)
-  const panel = document.getElementById('centerPanel');
-  const combatView = document.getElementById('combatView');
-  if(panel && combatView){
-    panel.innerHTML = '<div class="card-title">功能面板预览</div>'+
-      '<div style="padding:20px;text-align:center;color:#999">选择右侧菜单查看对应面板</div>';
-  }
-
+  const panel=document.getElementById('centerPanel');
+  if(panel)panel.innerHTML='<div class="card-title">功能面板预览</div><div style="padding:20px;text-align:center;color:#999">选择右侧菜单查看对应面板</div>';
 })();
 </script>
 </body>
