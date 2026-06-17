@@ -576,7 +576,7 @@ body{
 
 
 /* ========== FORCE LANDSCAPE OVERRIDE ========== */
-.game-container.force-landscape{transform:none!important;border-radius:0!important;box-shadow:none!important}
+.game-container.force-landscape{border-radius:0!important;box-shadow:none!important}
 
 /* ========== MOBILE SCALE ADAPTATION ========== */
 /* Automatically scale to fit any screen size */
@@ -893,24 +893,21 @@ document.addEventListener('webkitfullscreenchange',()=>{
       // Rotate 90° + scale to fill screen
       const scale=Math.min(w/900, h/2000);
       container.classList.add('force-landscape');
-      container.style.position='fixed';
-      container.style.top='0';container.style.left='0';
-      container.style.width='900px';container.style.height='2000px';
-      container.style.transform='rotate(90deg) scale('+scale+')';
-      container.style.transformOrigin='top left';
-      document.body.style.background='#000';
-      document.body.style.justifyContent='flex-start';
-      document.body.style.alignItems='flex-start';
+      container.style.setProperty('position','fixed','important');
+      container.style.setProperty('top','0','important');
+      container.style.setProperty('left','0','important');
+      container.style.setProperty('width','900px','important');
+      container.style.setProperty('height','2000px','important');
+      container.style.setProperty('transform','rotate(90deg) scale('+scale+')','important');
+      container.style.setProperty('transform-origin','top left','important');
+      document.body.style.setProperty('background','#000','important');
+      document.body.style.setProperty('justify-content','flex-start','important');
+      document.body.style.setProperty('align-items','flex-start','important');
+      document.body.style.setProperty('min-height','auto','important');
     }else{
       container.classList.remove('force-landscape');
-      container.style.position='';
-      container.style.top='';container.style.left='';
-      container.style.width='';container.style.height='';
-      container.style.transform='';
-      container.style.transformOrigin='';
-      document.body.style.background='';
-      document.body.style.justifyContent='';
-      document.body.style.alignItems='';
+      ['position','top','left','width','height','transform','transform-origin'].forEach(p=>container.style.removeProperty(p));
+      ['background','justify-content','align-items','min-height'].forEach(p=>document.body.style.removeProperty(p));
     }
   }
 
