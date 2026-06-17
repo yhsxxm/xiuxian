@@ -578,6 +578,23 @@ body{
 /* ========== FORCE LANDSCAPE OVERRIDE ========== */
 .game-container.force-landscape{border-radius:0!important;box-shadow:none!important}
 
+/* ========== PORTRAIT → LANDSCAPE ROTATION ========== */
+@media(orientation:portrait){
+  body{
+    width:100vh!important;height:100vw!important;
+    transform:rotate(90deg) translateY(-100%)!important;
+    transform-origin:left top!important;
+    background:#000!important;
+    justify-content:center!important;align-items:center!important;
+    min-height:auto!important;overflow:hidden!important;
+  }
+  .game-container{
+    transform:scale(min(0.406,min(100vh/2000,100vw/900)))!important;
+    transform-origin:center center!important;
+    border-radius:0!important;box-shadow:none!important;
+  }
+}
+
 /* ========== MOBILE SCALE ADAPTATION ========== */
 /* Automatically scale to fit any screen size */
 @media(max-height:600px){
@@ -879,43 +896,7 @@ document.addEventListener('webkitfullscreenchange',()=>{
   if(icon)icon.textContent=document.webkitFullscreenElement?'⛷':'⛶';
 });
 
-// ==================== FORCE LANDSCAPE ====================
-(function(){
-  const container=document.getElementById('gameContainer');
-
-  function apply(){
-    const w=window.innerWidth, h=window.innerHeight;
-    const portrait=h>w;
-
-    if(portrait){
-      // Lock orientation
-      if(screen.orientation&&screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{});
-      // Rotate 90° + scale to fill screen
-      const scale=Math.min(w/900, h/2000);
-      container.classList.add('force-landscape');
-      container.style.setProperty('position','fixed','important');
-      container.style.setProperty('top','0','important');
-      container.style.setProperty('left','0','important');
-      container.style.setProperty('width','900px','important');
-      container.style.setProperty('height','2000px','important');
-      container.style.setProperty('transform','rotate(90deg) scale('+scale+')','important');
-      container.style.setProperty('transform-origin','top left','important');
-      document.body.style.setProperty('background','#000','important');
-      document.body.style.setProperty('justify-content','flex-start','important');
-      document.body.style.setProperty('align-items','flex-start','important');
-      document.body.style.setProperty('min-height','auto','important');
-    }else{
-      container.classList.remove('force-landscape');
-      ['position','top','left','width','height','transform','transform-origin'].forEach(p=>container.style.removeProperty(p));
-      ['background','justify-content','align-items','min-height'].forEach(p=>document.body.style.removeProperty(p));
-    }
-  }
-
-  apply();
-  window.addEventListener('resize',apply);
-  window.addEventListener('orientationchange',()=>setTimeout(apply,100));
-
-  // ==================== STATIC UI INITIALIZATION ====================
+// ==================== STATIC UI INITIALIZATION ====================
   document.getElementById('topLingshi').textContent='1000';
   document.getElementById('topQiVal').textContent='500';
   document.getElementById('topQiBar').style.width='100%';
@@ -929,7 +910,6 @@ document.addEventListener('webkitfullscreenchange',()=>{
 
   const panel=document.getElementById('centerPanel');
   if(panel)panel.innerHTML='<div class="card-title">功能面板预览</div><div style="padding:20px;text-align:center;color:#999">选择右侧菜单查看对应面板</div>';
-})();
 </script>
 </body>
 </html>
